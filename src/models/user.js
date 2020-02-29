@@ -78,11 +78,9 @@ userSchema.pre('remove',async function(next){
 
 userSchema.methods.generateAuthToken = async function(){
     const user = this
-    console.log(user._id.toString)
     const token = jwt.sign({ _id: user._id.toString()},process.env.JWT_SECRET)
     user.tokens = user.tokens.concat({token})
     await user.save()
-    console.log(token)
     return token
 }
 

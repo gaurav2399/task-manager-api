@@ -13,7 +13,6 @@ router.get('/users/me', auth, async (req,res) => {
 
     try{
         const _id = req.params.id
-        console.log(req.params)
         const user = await User.findById(_id)
         if(!user)
             return res.status(400).send('user not found')
@@ -28,7 +27,6 @@ router.post('/users',async (req,res) => {
     try{
         console.log(req.body)
         const user = new User(req.body)
-        console.log(user)
         await user.save()
         const token = await user.generateAuthToken()
         res.send({user,token})
@@ -73,10 +71,8 @@ router.post('/users/logoutAll', auth, async (req,res) => {
 
 router.patch('/users/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
-    console.log(updates)
     const allowedUpdates = ["name","email","password","age"]
     const isValidUpdate = updates.every((update) => allowedUpdates.includes(update))
-    console.log(isValidUpdate)
 
     if(!isValidUpdate)
         return res.status(400).send({error: "invalid update!"})
@@ -110,15 +106,14 @@ router.post('/users/me/avatar',auth,avatar.single('avatar'),async(req,res) => {
     res.status(400).send({error: error.message})
 })
 
-router.delete('users/me/avatar',auth,async (req,res) => {
-    try{
-    req.user.avatar = {}
-    await req.user.save()
-    res.status(200),send()
-    }catch(e){
-        res.status(400).send(e)
+router.delete('/users/me', auth, async (req, res) => {
+    try {
+        await req.user.remove();
+        res.send(req.user);
+    } catch(e) {
+        res.status(500).send();
     }
-})
+});
 
 router.delete('/users/me/avatar', auth, async (req, res) => {
     try{
